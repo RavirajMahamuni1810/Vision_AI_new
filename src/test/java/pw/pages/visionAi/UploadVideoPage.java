@@ -3232,9 +3232,9 @@ public class UploadVideoPage
 	// TC_56 Create an API key and validate the success popup appears
 	// ====================================================================================================
 	// Settings -> API tab -> Create API key -> enter a name -> Create -> a success popup is shown.
-	// Match the API tab by its visible label (and the shared tab class) rather than the active-state
-	// styling, so the click lands on the API tab even when a different tab is selected by default.
-	private static final String API_TAB = "//button[contains(@class,'border-b-2') and contains(normalize-space(.),'API')]";
+	// Match the API Keys tab by its stable data-tour attribute (NOT the active-state class) so it works
+	// even though "User Management" is the default-active tab on the Settings page.
+	private static final String API_TAB = "//button[@data-tour='settings-apiKeys']";
 	private static final String CREATE_API_KEY_BUTTON = "//button[@class='flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 transition-all border border-white/10 cursor-pointer']";
 	private static final String API_KEY_NAME_INPUT = "//input[@class='w-full bg-zinc-950/60 border border-white/10 rounded-xl py-2.5 px-4 focus:outline-none focus:ring-1 focus:ring-white/20 transition-all placeholder:text-zinc-500 text-white text-sm']";
 	private static final String CREATE_API_KEY_SUBMIT = "//button[@class='px-6 py-2.5 rounded-xl bg-white text-zinc-900 text-sm font-medium hover:bg-zinc-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer']";

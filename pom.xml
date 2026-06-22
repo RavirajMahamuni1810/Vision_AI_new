@@ -32,6 +32,7 @@
 			<version>2.32.0</version>
 			<scope>test</scope>
 		</dependency>
+		
 
 		<!-- TestNG -->
 		<dependency>
@@ -120,6 +121,11 @@
 				</configuration>
 			</plugin>
 
+<plugin>
+    <groupId>io.qameta.allure</groupId>
+    <artifactId>allure-maven</artifactId>
+    <version>2.12.0</version>
+</plugin>
 			<!-- Surefire (TestNG) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
