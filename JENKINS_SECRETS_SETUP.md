@@ -10,12 +10,16 @@ You must provide the following environment variables in your Jenkins job
 
 | Environment variable | Used for | Excel location (was) |
 |----------------------|----------|----------------------|
-| `GEMINI_API_KEY`     | Google Gemini API key for AI failure analysis | `settings!B21` |
 | `EMAIL_APP_PASSWORD` | Zoho app token used to send email reports      | `settings!B11/C11` |
 | `MINOP_PASSWORD`     | Minop login password (login / cms / notification tests) | `login/cms/Notificationrule` col E |
 | `VISIONAI_PASSWORD`  | VisionAI login password                        | `loginVisionAI` col D |
 | `MYSQL_CONN_QC`      | Full JDBC URL incl. user/password for the QC DB   | `settings!B18` |
 | `MYSQL_CONN_STAGE`   | Full JDBC URL incl. user/password for the Stage DB | `settings!C18` |
+
+> **AI failure analysis is optional and disabled by default.** `GEMINI_API_KEY` is
+> **not** required for the pipeline. If you ever want AI root-cause analysis on
+> failures, set `GEMINI_API_KEY`; otherwise the AI step is skipped automatically
+> (see `PWBaseTest.isAIConfigured()`).
 
 ### Example `MYSQL_CONN_QC` value
 ```
@@ -27,8 +31,7 @@ jdbc:mysql://<host>:3306/<db>?user=<user>&password=<password>&autoReconnect=true
 pipeline {
   agent any
   environment {
-    GEMINI_API_KEY     = credentials('gemini-api-key')
-    EMAIL_APP_PASSWORD = credentials('zoho-email-token')
+    EMAIL_APP_PASSWORD = credentials('email-app-password')
     MINOP_PASSWORD     = credentials('minop-password')
     VISIONAI_PASSWORD  = credentials('visionai-password')
     MYSQL_CONN_QC      = credentials('mysql-conn-qc')
@@ -50,6 +53,6 @@ pipeline {
 ### Running locally
 Set the same variables in your shell before running Maven, e.g. (PowerShell):
 ```powershell
-$env:GEMINI_API_KEY="..."; $env:MINOP_PASSWORD="..."; $env:VISIONAI_PASSWORD="..."
+$env:MINOP_PASSWORD="..."; $env:VISIONAI_PASSWORD="..."; $env:EMAIL_APP_PASSWORD="..."
 mvn test -DsuiteXmlFile=VisionAI.xml
 ```

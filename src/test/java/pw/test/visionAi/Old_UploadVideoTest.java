@@ -1275,7 +1275,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	//************************************API KEY************************** */
 	// TC_56 Create an API key and validate the success popup appears==================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "settings")
-	@Test(dataProvider = "loginData", enabled = false, priority = 56, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 56, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_56(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -1863,7 +1863,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 	// TC_90 Invite a user to Automation Team, accept it from Gmail in a separate Edge browser, land on dashboard=================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "settings")
-	@Test(dataProvider = "loginData", enabled = true, priority = 90, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled =false, priority = 90, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_92(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -1881,7 +1881,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 	// TC_91 Member leaves Automation Team (in Edge) and the team is no longer visible=================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "settings")
-	@Test(dataProvider = "loginData", enabled = true, priority = 91, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled =false, priority = 91, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_93(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());

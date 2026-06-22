@@ -179,7 +179,7 @@ public final class PWLog {
 //		System.out.println("Console Logs: " + ctx.getConsoleLogs());
 //		System.out.println("Failed APIs: " + ctx.getFailedApis());
 		FailureContext ctx = PWBaseTest.getFailureContext();
-		if (PWBaseTest.isAIImmediateMode()) {
+		if (PWBaseTest.isAIConfigured() && PWBaseTest.isAIImmediateMode()) {
 			Allure.step("🤖 AI Root Cause Analysis", () -> {
 
 				long start = System.currentTimeMillis();
@@ -199,7 +199,7 @@ public final class PWLog {
 						new ByteArrayInputStream(aiResult.getBytes(StandardCharsets.UTF_8)), ".md");
 
 			});
-		} else {
+		} else if (PWBaseTest.isAIConfigured()) {
 			AISuiteCollector.addFailure(ctx);
 		}
 		// Mark test as failed
