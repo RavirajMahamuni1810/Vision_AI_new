@@ -152,7 +152,15 @@ public abstract class PWBaseTest {
 	        	    "--disable-features=TranslateUI"
 	        	);
 
-	        String userDataDir = "playwright-user-data";
+	        // Profile (login session) directory. Locally this defaults to the project-relative
+	        // "playwright-user-data" (your existing logged-in profile). In CI/Jenkins set the env var
+	        // PLAYWRIGHT_USER_DATA_DIR to an ABSOLUTE path of a pre-logged-in profile so the app opens
+	        // already authenticated instead of on the Sign In page.
+	        String userDataDir = System.getenv("PLAYWRIGHT_USER_DATA_DIR");
+	        if (userDataDir == null || userDataDir.trim().isEmpty()) {
+	            userDataDir = "playwright-user-data";
+	        }
+	        System.out.println("🗂️ Using browser profile dir: " + userDataDir);
 
 	        // =====================================================
 	        // IMPORTANT FIX
