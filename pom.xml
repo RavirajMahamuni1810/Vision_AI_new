@@ -11,10 +11,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
-		<!-- Default TestNG suite. Override on the command line: mvn clean test -DsuiteXmlFile=VisionAI.xml -->
-		<suiteXmlFile>VisionAI.xml</suiteXmlFile>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 	</properties>
 
 	<!-- ================= DEPENDENCIES ================= -->
@@ -129,17 +127,9 @@
 				<version>3.2.5</version>
 				<configuration>
 					<suiteXmlFiles>
-						<!-- Driven by the ${suiteXmlFile} property; override with -DsuiteXmlFile=... -->
-						<suiteXmlFile>${project.basedir}/${suiteXmlFile}</suiteXmlFile>
+						<suiteXmlFile>${project.basedir}/Old_UploadVideoTest.xml</suiteXmlFile>
 					</suiteXmlFiles>
 				</configuration>
-			</plugin>
-
-			<!-- Exec plugin (pinned) - used by the CI step that installs Playwright browsers -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.1.0</version>
 			</plugin>
 
 		</plugins>

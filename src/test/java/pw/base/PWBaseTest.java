@@ -903,14 +903,6 @@ public abstract class PWBaseTest {
 		return jenAIExecutionMode;
 	}
 
-	// AI failure analysis (Gemini) is OPTIONAL. It runs only when a real Gemini key is configured. When the
-	// GEMINI_API_KEY env var is absent, the settings placeholder stays as "${GEMINI_API_KEY}" (unresolved),
-	// so this returns false and the whole AI path is skipped - no Gemini calls, no CI dependency on a key.
-	public static boolean isAIConfigured() {
-		String key = mapAllVariables.get("geminikey");
-		return key != null && !key.trim().isEmpty() && !key.contains("${");
-	}
-
 	public static void setCurrentClassName(String className) {
 		currentClassName.set(className);
 	}
