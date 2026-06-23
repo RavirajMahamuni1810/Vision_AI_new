@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.testng.IConfigurationListener;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestContext;
@@ -43,7 +44,7 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import pw.base.PWBaseTest;
 import pw.utils.PWLog;
 
-public class PWExecutionController implements ISuiteListener, ITestListener {
+public class PWExecutionController implements ISuiteListener, ITestListener, IConfigurationListener {
 
 	private String runFolder;
 	private boolean rerun = false;
@@ -140,7 +141,10 @@ public class PWExecutionController implements ISuiteListener, ITestListener {
 	public void onTestSuccess(ITestResult result) {
 
 		passed++;
-		test.get().pass("Test Passed");
+		ExtentTest t = test.get();
+		if (t != null) {
+			t.pass("Test Passed");
+		}
 
 		captureScreenshot(result, "Success Screenshot");
 		logResult(result, "PASSED");
@@ -153,7 +157,15 @@ public class PWExecutionController implements ISuiteListener, ITestListener {
 	public void onTestFailure(ITestResult result) {
 
 		failed++;
-		test.get().fail(result.getThrowable());
+		ExtentTest t = test.get();
+		if (t != null) {
+			t.fail(result.getThrowable());
+		} else {
+			// Test never started (its @BeforeMethod / browser launch failed). Surface the real cause
+			// instead of NPE-ing on a null ExtentTest.
+			System.out.println("⚠️ Test failed before it started (setup/browser-launch issue): "
+					+ result.getThrowable());
+		}
 
 		captureScreenshot(result, "Failure Screenshot");
 		logResult(result, "FAILED");
@@ -166,8 +178,25 @@ public class PWExecutionController implements ISuiteListener, ITestListener {
 	public void onTestSkipped(ITestResult result) {
 
 		skipped++;
-		test.get().skip("Test Skipped");
+		ExtentTest t = test.get();
+		if (t != null) {
+			t.skip("Test Skipped");
+		} else {
+			System.out.println("⚠️ Test skipped (setup/@BeforeMethod failure): " + result.getThrowable());
+		}
 		logResult(result, "SKIPPED");
+	}
+
+	// =========================
+	// CONFIG FAILURE (e.g. @BeforeMethod / browser launch) - surface the REAL cause, don't hide it.
+	// =========================
+	@Override
+	public void onConfigurationFailure(ITestResult result) {
+		System.out.println("❌ CONFIGURATION FAILURE in " + result.getMethod().getMethodName() + ": "
+				+ result.getThrowable());
+		if (result.getThrowable() != null) {
+			result.getThrowable().printStackTrace();
+		}
 	}
 
 	// =========================
@@ -184,7 +213,10 @@ public class PWExecutionController implements ISuiteListener, ITestListener {
 
 				// Extent
 				String path = saveScreenshot(screenshot, result.getMethod().getMethodName());
-				test.get().addScreenCaptureFromPath(path);
+				ExtentTest t = test.get();
+				if (t != null && path != null) {
+					t.addScreenCaptureFromPath(path);
+				}
 			}
 		} catch (Exception e) {
 			System.out.println("Screenshot error: " + e.getMessage());

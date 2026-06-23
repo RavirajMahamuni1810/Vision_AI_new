@@ -4906,6 +4906,84 @@ public class UploadVideoPage
 		System.out.println("➡️ " + description);
 	}
 
+	// TC_00 One-time Google sign-in so the persistent profile holds an authenticated session for the suite.
+	// Run TC_00 (priority 0) together with any test (e.g. TC_56); TC_00 signs in first and the persistent
+	//   profile keeps the session, so later tests open already authenticated. Skips automatically when the
+	//   profile is already logged in (the "Continue with Google" button won't be present).
+	private static final String CONTINUE_WITH_GOOGLE_BTN = "//button[@class='mt-10 w-full h-12 inline-flex items-center justify-center gap-3 rounded-xl bg-white text-black font-medium hover:bg-zinc-100 transition-all shadow-depth-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer']";
+	private static final String GOOGLE_EMAIL_INPUT = "(//input[@class='whsOnd zHQkBf'])[1]";
+	private static final String GOOGLE_PASSWORD_INPUT = "(//input[@class='whsOnd zHQkBf'])[1]";
+	private static final String GOOGLE_NEXT_BUTTON = "(//div[@class='VfPpkd-RLmnJb'])[2]";
+
+	public boolean LoginWithGoogle(String email, String password) {
+		try {
+			// 0) If the profile is already authenticated, the "Continue with Google" button isn't shown -> skip.
+			boolean needLogin;
+			try {
+				page.locator(CONTINUE_WITH_GOOGLE_BTN).first()
+						.waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(8000));
+				needLogin = true;
+			} catch (Exception alreadyAuthenticated) {
+				needLogin = false;
+			}
+			if (!needLogin) {
+				System.out.println("✅ Already authenticated (persistent session) - skipping Google login");
+				return true;
+			}
+
+			// Credentials must be configured (set GOOGLE_EMAIL / GOOGLE_PASSWORD as env vars, esp. in Jenkins).
+			if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+				String errorMsg = "❌ GOOGLE_EMAIL / GOOGLE_PASSWORD not set - cannot perform Google login";
+				System.out.println(errorMsg);
+				PWBaseTest.getFailureContext().setErrorMessage(errorMsg);
+				return false;
+			}
+
+			// 1) Start the Google OAuth flow.
+			PWActions.click(CONTINUE_WITH_GOOGLE_BTN, "Clicked Continue with Google");
+
+			// 2) Enter the email and continue.
+			PWActions.waitFor(GOOGLE_EMAIL_INPUT, "Wait for Google email field", 30000);
+			PWActions.fill(GOOGLE_EMAIL_INPUT, email, "Entered Google email");
+			PWActions.waitFor(GOOGLE_NEXT_BUTTON, "Wait for Next (email)", 30000);
+			PWActions.click(GOOGLE_NEXT_BUTTON, "Clicked Next (email)");
+
+			// 3) Enter the password and continue.
+			PWActions.waitFor(GOOGLE_PASSWORD_INPUT, "Wait for Google password field", 30000);
+			Thread.sleep(1500); // let the password screen settle in
+			PWActions.fill(GOOGLE_PASSWORD_INPUT, password, "Entered Google password");
+			PWActions.waitFor(GOOGLE_NEXT_BUTTON, "Wait for Next (password)", 30000);
+			PWActions.click(GOOGLE_NEXT_BUTTON, "Clicked Next (password)");
+
+			// 4) Wait to be redirected back to the app, signed in (poll up to 60s for a non-login app URL).
+			long deadline = System.currentTimeMillis() + 60000;
+			while (System.currentTimeMillis() < deadline) {
+				String url = page.url();
+				if (url.contains("dev.vision.mikshi.ai") && !url.contains("/login")
+						&& !url.contains("accounts.google.com")) {
+					break;
+				}
+				Thread.sleep(1000);
+			}
+			Thread.sleep(2000);
+
+			if (page.url().contains("/login") || page.url().contains("accounts.google.com")) {
+				String errorMsg = "❌ Google login did not complete - still on login/OAuth page: " + page.url();
+				System.out.println(errorMsg);
+				PWBaseTest.getFailureContext().setErrorMessage(errorMsg);
+				return false;
+			}
+
+			System.out.println("✅ Google login completed - now at " + page.url());
+			return true;
+
+		} catch (Exception e) {
+			PWBaseTest.getFailureContext().setErrorMessage(e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	// TC_75 Validate that every video returned by a collection Detect Violence search has the expected name
 	// ====================================================================================================
 	// Conversations (Search) -> source = Collections -> pick "Automation_collection" -> Done -> Detect
