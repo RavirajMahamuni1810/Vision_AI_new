@@ -158,7 +158,11 @@ public abstract class PWBaseTest {
 	        // already authenticated instead of on the Sign In page.
 	        String userDataDir = System.getenv("PLAYWRIGHT_USER_DATA_DIR");
 	        if (userDataDir == null || userDataDir.trim().isEmpty()) {
-	            userDataDir = "playwright-user-data";
+	            // Absolute path to the ALREADY-LOGGED-IN profile on this machine. Jenkins clones into its own
+	            // workspace, so a relative "playwright-user-data" would be empty there; the absolute path makes
+	            // Jenkins reuse the same authenticated session as local runs. (Override with the env var if
+	            // you ever run on a different machine.)
+	            userDataDir = "C:\\Users\\MN001752\\git\\repository\\Miksh\\playwright-user-data";
 	        }
 	        System.out.println("🗂️ Using browser profile dir: " + userDataDir);
 
