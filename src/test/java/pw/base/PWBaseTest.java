@@ -446,7 +446,24 @@ public abstract class PWBaseTest {
 	@BeforeSuite(alwaysRun = true)
 	public void BeforeSuiteBase() {
 		try {
-			 
+			// Clean up videos from previous runs so only the current suite's videos remain.
+			try {
+				Path reportsRoot = Paths.get("reports");
+				if (Files.exists(reportsRoot)) {
+					Files.walk(reportsRoot)
+							.filter(p -> p.toString().toLowerCase().endsWith(".webm"))
+							.forEach(p -> {
+								try {
+									Files.deleteIfExists(p);
+								} catch (Exception ignore) {
+								}
+							});
+					System.out.println("🧹 Cleared previous test videos (*.webm) from reports/");
+				}
+			} catch (Exception cleanupEx) {
+				System.out.println("Video cleanup skipped: " + cleanupEx.getMessage());
+			}
+
 			ts = System.getProperty("timestamp");
 			reportTime = ts;
 			Map<String, String> allSuiteParam = PWExecutionController.SUITE_PARAMS;
