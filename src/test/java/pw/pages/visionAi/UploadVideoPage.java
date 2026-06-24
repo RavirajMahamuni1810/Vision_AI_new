@@ -305,13 +305,20 @@ public class UploadVideoPage
 		return CompleteUploadVideo("VI_01");
 	}
 
-	// Complete the upload and verify the uploaded video appears in the list by its displayed title.
-	// videoTitle is the exact text shown in the card's <h3> (e.g. "avi_format.avi", "3_GP_format").
+	// Complete the upload and verify the uploaded video appears in the list.
+	// videoTitle is the base name shown on the card (e.g. "avi_format", "VI_01"). We match with contains()
+	// because the card shows the full name with extension while uploading (e.g. "VI_01.mp4") and the base
+	// name once processed (e.g. "VI_01").
 	public boolean CompleteUploadVideo(String videoTitle) {
 		try {
-			PWActions.click("(//button[@type='button'])[6]", "Clicked on Upload");
+			// Click the DIALOG's "Upload Video" commit button (the last one in the DOM = the modal footer
+			// button, not the page button that opened the dialog). This actually sends the file.
+			String commitBtn = "(//button[normalize-space()='Upload Video'])[last()]";
+			PWActions.waitFor(commitBtn, "Wait for dialog 'Upload Video' button", 30000);
+			PWActions.click(commitBtn, "Clicked 'Upload Video' (commit upload)");
 
-			String cardSelector = "//h3[text()='" + videoTitle + "']";
+			// Wait for the uploaded video's card to appear in the list.
+			String cardSelector = "//h3[contains(normalize-space(),'" + videoTitle + "')]";
 			PWActions.waitFor(cardSelector, "Wait for uploaded video '" + videoTitle + "'", 120000);
 
 			if (PWActions.isVisible(cardSelector, "Video '" + videoTitle + "' uploaded successfully")) {
