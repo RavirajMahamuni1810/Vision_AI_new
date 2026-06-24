@@ -443,25 +443,42 @@ public abstract class PWBaseTest {
 		}
 	}
 
+	// Recursively delete a directory and everything under it (best-effort).
+	private static void deleteRecursively(Path dir) {
+		try (java.util.stream.Stream<Path> walk = Files.walk(dir)) {
+			walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
+				try {
+					Files.deleteIfExists(p);
+				} catch (Exception ignore) {
+				}
+			});
+		} catch (Exception ignore) {
+		}
+	}
+
 	@BeforeSuite(alwaysRun = true)
 	public void BeforeSuiteBase() {
 		try {
-			// Clean up videos from previous runs so only the current suite's videos remain.
+			// Delete previous run folders (old screenshots/videos/logs/reports) so each run starts clean,
+			// keeping ONLY the current run's folder (already created by the listener before @BeforeSuite).
 			try {
 				Path reportsRoot = Paths.get("reports");
+				String execDir = System.getProperty("execution.dir");
+				Path currentRun = (execDir != null && !execDir.trim().isEmpty())
+						? Paths.get(execDir).toAbsolutePath().normalize()
+						: null;
 				if (Files.exists(reportsRoot)) {
-					Files.walk(reportsRoot)
-							.filter(p -> p.toString().toLowerCase().endsWith(".webm"))
-							.forEach(p -> {
-								try {
-									Files.deleteIfExists(p);
-								} catch (Exception ignore) {
-								}
-							});
-					System.out.println("🧹 Cleared previous test videos (*.webm) from reports/");
+					try (java.util.stream.Stream<Path> children = Files.list(reportsRoot)) {
+						children.filter(Files::isDirectory)
+								.filter(p -> p.getFileName().toString().startsWith("RunID-"))
+								.filter(p -> currentRun == null
+										|| !p.toAbsolutePath().normalize().equals(currentRun))
+								.forEach(PWBaseTest::deleteRecursively);
+					}
+					System.out.println("🧹 Cleared previous run folders from reports/ (kept current run)");
 				}
 			} catch (Exception cleanupEx) {
-				System.out.println("Video cleanup skipped: " + cleanupEx.getMessage());
+				System.out.println("Reports cleanup skipped: " + cleanupEx.getMessage());
 			}
 
 			ts = System.getProperty("timestamp");
