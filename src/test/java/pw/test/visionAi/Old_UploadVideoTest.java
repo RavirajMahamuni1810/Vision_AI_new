@@ -319,7 +319,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// to run (e.g. TC_56) so the persistent profile is authenticated before that test executes. It skips
 	// automatically when already logged in. Set GOOGLE_EMAIL / GOOGLE_PASSWORD as env vars (e.g. in Jenkins).
 	@TestMeta(user = UserType.ADMIN, navPath = "")
-	@Test(dataProvider = "loginData", enabled = false, priority = 0, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 0, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_00(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
