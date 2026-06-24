@@ -72,42 +72,42 @@ public class Old_UploadVideoTest extends PWBaseTest
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 102, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_102(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData, "avi_format.avi");
+		uploadVideoAndValidate(testData, "avi_format");
 	}
 
 	// TC_103 Upload a .mkv video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 103, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_103(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData, "mkv_format.mkv");
+		uploadVideoAndValidate(testData, "mkv_format");
 	}
 
 	// TC_104 Upload a .mov video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 104, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_104(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData, "mov_format.mov");
+		uploadVideoAndValidate(testData, "mov_format");
 	}
 
 	// TC_105 Upload a .webm video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 105, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_105(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData, "webm_format.webm");
+		uploadVideoAndValidate(testData, "webm_format");
 	}
 
 	// TC_106 Upload a .wmv video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 106, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_106(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData, "wmv_format.wmv");
+		uploadVideoAndValidate(testData, "wmv_format");
 	}
 
 	// TC_107 Upload the (corrupt-named) file and validate it appears in the list
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 107, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_107(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData, "Currept_File.mp4");
+		uploadVideoAndValidate(testData, "Currept_File");
 	}
 
 	// Shared upload-and-verify flow for TC_101 - TC_107. expectedTitle is the exact card <h3> text shown
