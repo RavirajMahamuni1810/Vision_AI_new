@@ -843,12 +843,33 @@ public abstract class PWBaseTest {
 		try {
 			Page currentPage = getPage();
 			if (currentPage != null) {
-				// The video was already saved + attached and the page closed by the test-result listener
-				// (PWExecutionController.captureVideo), where the Allure test context is still active. Here we
-				// only need to make sure the page is closed and then close the context.
+				String recordVideo = mapAllVariables.get("recordVideo");
+				boolean wantVideo = recordVideo != null && "Y".equalsIgnoreCase(recordVideo.trim());
+				Video video = wantVideo ? currentPage.video() : null;
+
+				// Close the page first (this finalizes the recording).
 				if (!currentPage.isClosed()) {
 					currentPage.close();
 				}
+
+				// Save the video for EVERY test into the run's report folder (best-effort). It is viewable
+				// there directly. saveAs() can intermittently throw "no video frames" on a persistent context
+				// even though the file is written, so we just warn and move on.
+				if (video != null) {
+					try {
+						String execDir = System.getProperty("execution.dir");
+						Path destDir = (execDir != null && !execDir.trim().isEmpty())
+								? Paths.get(execDir)
+								: Paths.get("target", "videos");
+						Files.createDirectories(destDir);
+						Path videoFile = destDir.resolve(result.getMethod().getMethodName() + ".webm");
+						video.saveAs(videoFile);
+						System.out.println("🎥 Saved video: " + videoFile);
+					} catch (Exception e) {
+						System.out.println("Video save warning: " + e.getMessage());
+					}
+				}
+
 				if (context != null) {
 					context.close();
 				}

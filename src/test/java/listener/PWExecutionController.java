@@ -147,7 +147,6 @@ public class PWExecutionController implements ISuiteListener, ITestListener, ICo
 		}
 
 		captureScreenshot(result, "Success Screenshot");
-		captureVideo(result);
 		logResult(result, "PASSED");
 	}
 
@@ -169,7 +168,6 @@ public class PWExecutionController implements ISuiteListener, ITestListener, ICo
 		}
 
 		captureScreenshot(result, "Failure Screenshot");
-		captureVideo(result);
 		logResult(result, "FAILED");
 	}
 
@@ -222,53 +220,6 @@ public class PWExecutionController implements ISuiteListener, ITestListener, ICo
 			}
 		} catch (Exception e) {
 			System.out.println("Screenshot error: " + e.getMessage());
-		}
-	}
-
-	// Save and attach the test video. Done HERE (in the test-result listener) - not in @AfterMethod -
-	// because the Allure test is still active here, so the attachment actually lands in the report. The page
-	// must be closed to finalize the Playwright recording, so we close it now; @AfterMethod then just closes
-	// the context.
-	private void captureVideo(ITestResult result) {
-		try {
-			String recordVideo = PWBaseTest.mapAllVariables.get("recordVideo");
-			if (recordVideo == null || !"Y".equalsIgnoreCase(recordVideo.trim()))
-				return;
-			Page page = PWBaseTest.getPage();
-			if (page == null)
-				return;
-			com.microsoft.playwright.Video video = page.video();
-			if (video == null)
-				return;
-			// Close the page to finalize the recording.
-			if (!page.isClosed())
-				page.close();
-			String execDir = System.getProperty("execution.dir");
-			java.nio.file.Path dest = (execDir != null && !execDir.trim().isEmpty())
-					? java.nio.file.Paths.get(execDir, result.getMethod().getMethodName() + ".webm")
-					: java.nio.file.Paths.get("target", "videos", result.getMethod().getMethodName() + ".webm");
-			java.nio.file.Files.createDirectories(dest.getParent());
-
-			// saveAs() sometimes WRITES the file and THEN throws "Page did not produce any video frames"
-			// (a persistent-context quirk). Isolate that so it doesn't skip the attach below.
-			try {
-				video.saveAs(dest);
-			} catch (Exception saveEx) {
-				System.out.println("video.saveAs warning (file may still be written): " + saveEx.getMessage());
-			}
-
-			// Attach the file if it actually exists with content - read into memory (same way the screenshot
-			// attaches, which works) so the video lands in the Allure report.
-			if (java.nio.file.Files.exists(dest) && java.nio.file.Files.size(dest) > 0) {
-				byte[] bytes = java.nio.file.Files.readAllBytes(dest);
-				Allure.addAttachment(result.getMethod().getMethodName() + " - Video", "video/webm",
-						new ByteArrayInputStream(bytes), "webm");
-				System.out.println("🎥 Video attached to report: " + dest);
-			} else {
-				System.out.println("🎥 Video not attached (empty/missing): " + dest);
-			}
-		} catch (Exception e) {
-			System.out.println("Video attach failed: " + e.getMessage());
 		}
 	}
 
