@@ -199,9 +199,13 @@ public abstract class PWBaseTest {
 	            persistentOptions.setSlowMo(8000);
 	        }
 
-	        // Video recording
+	        // Video recording. setViewportSize(null) (used for maximize) leaves no viewport for Playwright to
+	        // size the video from, which causes "Page did not produce any video frames". So set an explicit
+	        // recording size to force real frames.
 	        if (recordVideo.equalsIgnoreCase("Y")) {
-	            persistentOptions.setRecordVideoDir(Paths.get("target/videos"));
+	            persistentOptions
+	                    .setRecordVideoDir(Paths.get("target/videos"))
+	                    .setRecordVideoSize(1280, 720);
 	        }
 
 	        // =====================================================
@@ -811,21 +815,21 @@ public abstract class PWBaseTest {
 				// Close page first (this finalizes the recording)
 				currentPage.close();
 				if ("Y".equalsIgnoreCase(recordVideo) && video != null) {
-					if (result.getStatus() == ITestResult.FAILURE) {
-						try {
-							Path videoFile = Paths.get("target/videos",
-									result.getTestClass().getName() + "_" + result.getMethod().getMethodName() + "_"
-											+ Thread.currentThread().getId() + ".webm");
-							Files.createDirectories(videoFile.getParent());
-							video.saveAs(videoFile);
-							Allure.addAttachment(result.getMethod().getMethodName() + " - Video", "video/webm",
-									Files.newInputStream(videoFile), "webm");
-						} catch (Exception e) {
-							System.out.println("Video save failed: " + e.getMessage());
-						}
-					} else {
-						// Delete video for passed tests
-						video.delete();
+					// Save the video for EVERY test (pass and fail) into the run's report folder so it sits
+					// next to the screenshots and survives "mvn clean" (reports/ is outside target/).
+					try {
+						String execDir = System.getProperty("execution.dir");
+						Path destDir = (execDir != null && !execDir.trim().isEmpty())
+								? Paths.get(execDir)
+								: Paths.get("target", "videos");
+						Files.createDirectories(destDir);
+						Path videoFile = destDir.resolve(result.getMethod().getMethodName() + ".webm");
+						video.saveAs(videoFile);
+						Allure.addAttachment(result.getMethod().getMethodName() + " - Video", "video/webm",
+								Files.newInputStream(videoFile), "webm");
+						System.out.println("🎥 Saved video: " + videoFile);
+					} catch (Exception e) {
+						System.out.println("Video save failed: " + e.getMessage());
 					}
 				}
 				// Close context
