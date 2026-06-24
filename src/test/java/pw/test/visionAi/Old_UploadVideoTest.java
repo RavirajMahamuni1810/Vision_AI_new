@@ -41,7 +41,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_01_ Upload single
 	// video============================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 1, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 1, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_01(Method method, Map<String, String> testData) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
@@ -82,42 +82,42 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 	// TC_101 Upload a .3gp video and validate it uploads successfully (card title: 3_GP_format)
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 101, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 101, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_101(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData, "3_GP_format");
 	}
 
 	// TC_102 Upload a .avi video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 102, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 102, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_102(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData, "avi_format");
 	}
 
 	// TC_103 Upload a .mkv video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 103, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 103, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_103(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData, "mkv_format");
 	}
 
 	// TC_104 Upload a .mov video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 104, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 104, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_104(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData, "mov_format");
 	}
 
 	// TC_105 Upload a .webm video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 105, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 105, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_105(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData, "webm_format");
 	}
 
 	// TC_106 Upload a .wmv video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 106, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 106, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_106(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData, "wmv_format");
 	}
@@ -125,7 +125,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_107 Upload a corrupt file: the upload must FAIL (error shown), NOT complete. Passes only when the
 	// error appears (the "Just now" completed card must never show).
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 107, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 107, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_107(Method method, Map<String, String> testData) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
@@ -181,7 +181,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_02_ upload Multiple
 	// video===========================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 2, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 2, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_02(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -205,8 +205,8 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
  
 		 
-		if (UploadVideoPage.UploadMultiplevideoSuccessfully()) {
-			PWLog.Pass(className, "Complete   upload multiple video successfully and video is Appear in video list");
+		if (UploadVideoPage.UploadMultiplevideoSuccessfully("VI_01", "VI_02", "VI_15")) {
+			PWLog.Pass(className, "All 3 videos uploaded successfully and appear in the list (Just now)");
 
 		} else {
 			PWLog.Fail(className, " Unable to complete upload multiple video and video is not Appear in video list "

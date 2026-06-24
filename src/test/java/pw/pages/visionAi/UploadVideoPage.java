@@ -212,9 +212,8 @@ public class UploadVideoPage
 
 	public boolean Uploadmultiplefile(String... fileNames) {
 		try {
-			for (String fileName : fileNames) {
-				PWActions.uploadFile("input[type='file']", fileName, "Uploading video file: " + fileName);
-			}
+			// Set ALL files in one call - one setInputFiles per file would replace the previous selection.
+			PWActions.uploadFiles("input[type='file']", "Uploading video file(s)", fileNames);
 			return true;
 
 		} catch (Exception e) {
@@ -257,17 +256,24 @@ public class UploadVideoPage
 		}
 	}
 
-	public boolean UploadMultiplevideoSuccessfully() {
+	// Commit the multi-file upload and verify EACH given video completed (title + "Just now").
+	public boolean UploadMultiplevideoSuccessfully(String... videoTitles) {
 		try {
+			// Click the dialog's real "Upload Video" commit button (actually sends the files).
+			PWActions.waitFor(UPLOAD_VIDEO_COMMIT_BTN, "Wait for dialog 'Upload Video' button", 30000);
+			PWActions.click(UPLOAD_VIDEO_COMMIT_BTN, "Clicked 'Upload Video' (commit upload)");
 
-			PWActions.click("(//button[@type='button'])[6]", "Clicked on  Upload");
-
-			String videoXpath = "//div[contains(@class,'p-3')]" + "[.//h3[starts-with(normalize-space(),'VI_')]"
-					+ " and .//span[contains(.,'Just now')]]";
-
-			boolean status = PWActions.isVisible(videoXpath, "Video Uploaded successfully");
-
-			return status;
+			// Each uploaded video must show its completed card (title + "Just now").
+			for (String title : videoTitles) {
+				String completedCard = "//div[h3[text()='" + title + "'] and .//span[contains(.,'Just now')]]";
+				PWActions.waitFor(completedCard, "Wait for completed upload '" + title + "'", 120000);
+				if (!PWActions.isVisible(completedCard, "Video '" + title + "' upload completed")) {
+					PWBaseTest.getFailureContext().setErrorMessage("Video '" + title + "' did not complete upload");
+					return false;
+				}
+				System.out.println("✅ '" + title + "' upload completed (Just now)");
+			}
+			return true;
 
 		} catch (Exception e) {
 			PWBaseTest.getFailureContext().setErrorMessage(e.getMessage());

@@ -207,6 +207,36 @@ public class PWActions {
 		}
 	}
 
+	// Attach MULTIPLE files in a single setInputFiles call. Calling setInputFiles once per file replaces the
+	// previous selection, so all files must be set together here.
+	public static void uploadFiles(String locator, String stepName, String... fileNames) {
+		try {
+			Page page = PWBaseTest.getPage();
+			FailureContext ctx = PWBaseTest.getFailureContext();
+			ctx.setActionContext(stepName, "uploadFiles", locator);
+			PWLog.Info(PWBaseTest.getCurrentClassName(), stepName);
+
+			String baseDir = System.getProperty("user.dir");
+			java.nio.file.Path[] paths = new java.nio.file.Path[fileNames.length];
+			for (int i = 0; i < fileNames.length; i++) {
+				java.nio.file.Path p = Paths.get(baseDir, "data", "video", fileNames[i]);
+				if (!new File(p.toString()).exists()) {
+					throw new RuntimeException("File not found: " + p);
+				}
+				paths[i] = p;
+				System.out.println("Adding file: " + p);
+			}
+
+			page.locator(locator).setInputFiles(paths); // ALL files in one call
+
+			System.out.println("All files attached (" + fileNames.length + ")");
+
+		} catch (Exception e) {
+			System.out.println("Multi-file upload failed: " + e.getMessage());
+			throw new RuntimeException(e);
+		}
+	}
+
 	// GetText------------------------------------------------------------------------------------------------
 	public static String getText(String locator, String stepName) {
 	    Page page = PWBaseTest.getPage();
