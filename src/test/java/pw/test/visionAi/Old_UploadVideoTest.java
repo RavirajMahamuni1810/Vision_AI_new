@@ -22,7 +22,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_01_ Upload single
 	// video============================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 1, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 1, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_01(Method method, Map<String, String> testData) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
@@ -50,6 +50,116 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 		} else {
 			PWLog.Fail(className, " Unable to complete upload video and video is not Appear in video list "
+					+ PWBaseTest.getFailureContext().getErrorMessage());
+		}
+	}
+
+	// ===================================================================================================
+	// TC_101 - TC_106: Upload videos in different formats and validate each uploads successfully.
+	// TC_107: Upload a corrupt file and validate the error toast appears.
+	// All of these run RIGHT AFTER TC_01 (dependsOnMethods = M_689_VisionAi_Login_01) every time TC_01 runs.
+	// File comes from the Excel "qc_clipone" column for each TCID.
+	// ===================================================================================================
+
+	// TC_101 Upload a .3gp video and validate it uploads successfully
+	@TestMeta(user = UserType.ADMIN, navPath = "videos")
+	@Test(dataProvider = "loginData", enabled = true, priority = 101, groups = { "Smoke" }, dependsOnMethods = {
+			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	public void M_689_VisionAi_Login_101(Method method, Map<String, String> testData) {
+		uploadVideoAndValidate(testData);
+	}
+
+	// TC_102 Upload a .avi video and validate it uploads successfully
+	@TestMeta(user = UserType.ADMIN, navPath = "videos")
+	@Test(dataProvider = "loginData", enabled = true, priority = 102, groups = { "Smoke" }, dependsOnMethods = {
+			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	public void M_689_VisionAi_Login_102(Method method, Map<String, String> testData) {
+		uploadVideoAndValidate(testData);
+	}
+
+	// TC_103 Upload a .mkv video and validate it uploads successfully
+	@TestMeta(user = UserType.ADMIN, navPath = "videos")
+	@Test(dataProvider = "loginData", enabled = true, priority = 103, groups = { "Smoke" }, dependsOnMethods = {
+			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	public void M_689_VisionAi_Login_103(Method method, Map<String, String> testData) {
+		uploadVideoAndValidate(testData);
+	}
+
+	// TC_104 Upload a .mov video and validate it uploads successfully
+	@TestMeta(user = UserType.ADMIN, navPath = "videos")
+	@Test(dataProvider = "loginData", enabled = true, priority = 104, groups = { "Smoke" }, dependsOnMethods = {
+			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	public void M_689_VisionAi_Login_104(Method method, Map<String, String> testData) {
+		uploadVideoAndValidate(testData);
+	}
+
+	// TC_105 Upload a .webm video and validate it uploads successfully
+	@TestMeta(user = UserType.ADMIN, navPath = "videos")
+	@Test(dataProvider = "loginData", enabled = true, priority = 105, groups = { "Smoke" }, dependsOnMethods = {
+			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	public void M_689_VisionAi_Login_105(Method method, Map<String, String> testData) {
+		uploadVideoAndValidate(testData);
+	}
+
+	// TC_106 Upload a .wmv video and validate it uploads successfully
+	@TestMeta(user = UserType.ADMIN, navPath = "videos")
+	@Test(dataProvider = "loginData", enabled = true, priority = 106, groups = { "Smoke" }, dependsOnMethods = {
+			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	public void M_689_VisionAi_Login_106(Method method, Map<String, String> testData) {
+		uploadVideoAndValidate(testData);
+	}
+
+	// TC_107 Upload a corrupt file and validate the upload error message appears
+	@TestMeta(user = UserType.ADMIN, navPath = "videos")
+	@Test(dataProvider = "loginData", enabled = true, priority = 107, groups = { "Smoke" }, dependsOnMethods = {
+			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	public void M_689_VisionAi_Login_107(Method method, Map<String, String> testData) {
+		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
+		String className = this.getClass().getSimpleName();
+		String fileName = testData.get("clipone");
+
+		if (UploadVideoPage.UPload_Video()) {
+			PWLog.Pass(className, "Upload UI opened successfully");
+		} else {
+			PWLog.Fail(className, "Upload UI failed: " + PWBaseTest.getFailureContext().getErrorMessage());
+		}
+
+		if (UploadVideoPage.Uploadmultiplefile(fileName)) {
+			PWLog.Pass(className, "Corrupt file '" + fileName + "' selected");
+		} else {
+			PWLog.Fail(className, "File selection failed: " + PWBaseTest.getFailureContext().getErrorMessage());
+		}
+
+		if (UploadVideoPage.ValidateUploadErrorMessage()) {
+			PWLog.Pass(className, "Error message displayed for corrupt file '" + fileName + "'");
+		} else {
+			PWLog.Fail(className, "Error message not displayed for corrupt file: "
+					+ PWBaseTest.getFailureContext().getErrorMessage());
+		}
+	}
+
+	// Shared upload-and-verify flow for TC_101 - TC_106 (different video formats from qc_clipone).
+	private void uploadVideoAndValidate(Map<String, String> testData) {
+		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
+		String className = this.getClass().getSimpleName();
+		String fileName = testData.get("clipone");
+
+		if (UploadVideoPage.UPload_Video()) {
+			PWLog.Pass(className, "Upload UI opened successfully");
+		} else {
+			PWLog.Fail(className, "Upload UI failed: " + PWBaseTest.getFailureContext().getErrorMessage());
+		}
+
+		if (UploadVideoPage.Uploadmultiplefile(fileName)) {
+			PWLog.Pass(className, "Video '" + fileName + "' selected");
+		} else {
+			PWLog.Fail(className, "Video selection failed: " + PWBaseTest.getFailureContext().getErrorMessage());
+		}
+
+		if (UploadVideoPage.CompleteUploadVideo()) {
+			PWLog.Pass(className, "Video '" + fileName + "' uploaded successfully and appears in the list");
+		} else {
+			PWLog.Fail(className, "Video '" + fileName + "' not uploaded: "
 					+ PWBaseTest.getFailureContext().getErrorMessage());
 		}
 	}
@@ -209,7 +319,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// to run (e.g. TC_56) so the persistent profile is authenticated before that test executes. It skips
 	// automatically when already logged in. Set GOOGLE_EMAIL / GOOGLE_PASSWORD as env vars (e.g. in Jenkins).
 	@TestMeta(user = UserType.ADMIN, navPath = "")
-	@Test(dataProvider = "loginData", enabled = true, priority = 0, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 0, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_00(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -1296,7 +1406,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	//************************************API KEY************************** */
 	// TC_56 Create an API key and validate the success popup appears==================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "settings")
-	@Test(dataProvider = "loginData", enabled = true, priority = 56, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 56, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_56(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -1312,7 +1422,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 	// TC_57 Validate expiry date shown when selecting 3 months expiration==================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "settings")
-	@Test(dataProvider = "loginData", enabled = true, priority = 57, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 57, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_57(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());

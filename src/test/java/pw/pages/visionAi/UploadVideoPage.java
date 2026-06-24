@@ -4984,6 +4984,29 @@ public class UploadVideoPage
 		}
 	}
 
+	// TC_107 After selecting a corrupt/unsupported file, the app shows a red error toast. PASS if it appears.
+	private static final String UPLOAD_ERROR_TOAST = "//div[@class='pointer-events-auto inline-flex w-auto max-w-[560px] items-center gap-2.5 px-4 py-2.5 rounded-lg bg-zinc-900/95 backdrop-blur-md border border-red-500/30 shadow-depth-2 text-[13px] text-white animate-in fade-in slide-in-from-top-2 duration-200']";
+
+	public boolean ValidateUploadErrorMessage() {
+		try {
+			PWActions.waitFor(UPLOAD_ERROR_TOAST, "Wait for upload error toast", 30000);
+			if (PWActions.isVisible(UPLOAD_ERROR_TOAST, "Check upload error toast is visible")) {
+				String raw = page.locator(UPLOAD_ERROR_TOAST).first().textContent();
+				System.out.println("✅ TEST PASSED - Upload error message displayed: '"
+						+ (raw == null ? "" : raw.trim()) + "'");
+				return true;
+			}
+			String errorMsg = "❌ TEST FAILED - Upload error message did not appear";
+			System.out.println(errorMsg);
+			PWBaseTest.getFailureContext().setErrorMessage(errorMsg);
+			return false;
+		} catch (Exception e) {
+			PWBaseTest.getFailureContext().setErrorMessage(e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	// TC_75 Validate that every video returned by a collection Detect Violence search has the expected name
 	// ====================================================================================================
 	// Conversations (Search) -> source = Collections -> pick "Automation_collection" -> Done -> Detect
