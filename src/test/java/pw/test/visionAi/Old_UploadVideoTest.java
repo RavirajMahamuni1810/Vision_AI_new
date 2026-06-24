@@ -103,14 +103,36 @@ public class Old_UploadVideoTest extends PWBaseTest
 		uploadVideoAndValidate(testData, "wmv_format");
 	}
 
-	// TC_107 Upload the (corrupt-named) file and validate it appears in the list
+	// TC_107 Upload a corrupt file: the upload must FAIL (error shown), NOT complete. Passes only when the
+	// error appears (the "Just now" completed card must never show).
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 107, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_107(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData, "Currept_File");
+		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
+		String className = this.getClass().getSimpleName();
+		String fileName = testData.get("clipone");
+
+		if (UploadVideoPage.UPload_Video()) {
+			PWLog.Pass(className, "Upload UI opened successfully");
+		} else {
+			PWLog.Fail(className, "Upload UI failed: " + PWBaseTest.getFailureContext().getErrorMessage());
+		}
+
+		if (UploadVideoPage.Uploadmultiplefile(fileName)) {
+			PWLog.Pass(className, "Corrupt file '" + fileName + "' selected");
+		} else {
+			PWLog.Fail(className, "File selection failed: " + PWBaseTest.getFailureContext().getErrorMessage());
+		}
+
+		if (UploadVideoPage.ValidateCorruptUploadRejected()) {
+			PWLog.Pass(className, "Corrupt file '" + fileName + "' was correctly rejected with an error");
+		} else {
+			PWLog.Fail(className, "Corrupt file did not show an error (upload not rejected): "
+					+ PWBaseTest.getFailureContext().getErrorMessage());
+		}
 	}
 
-	// Shared upload-and-verify flow for TC_101 - TC_107. expectedTitle is the exact card <h3> text shown
+	// Shared upload-and-verify flow for TC_101 - TC_106 (valid formats). expectedTitle is the exact card <h3> text shown
 	// for the uploaded video (e.g. "avi_format.avi", "3_GP_format").
 	private void uploadVideoAndValidate(Map<String, String> testData, String expectedTitle) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());

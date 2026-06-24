@@ -305,29 +305,44 @@ public class UploadVideoPage
 		return CompleteUploadVideo("VI_01");
 	}
 
-	// Complete the upload and verify the uploaded video appears in the list.
-	// videoTitle is the base name shown on the card (e.g. "avi_format", "VI_01"). We match with contains()
-	// because the card shows the full name with extension while uploading (e.g. "VI_01.mp4") and the base
-	// name once processed (e.g. "VI_01").
+	// The dialog's "Upload Video" commit button (unique 1-of-1 class) that actually sends the file.
+	private static final String UPLOAD_VIDEO_COMMIT_BTN = "//button[@class='px-5 py-2 rounded-xl bg-white text-black text-sm font-medium hover:bg-zinc-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white cursor-pointer flex items-center gap-2']";
+
+	// Complete the upload and verify it actually SUCCEEDED. We wait for the COMPLETED card - the title plus
+	// the "Just now" timestamp - which only appears once the upload finishes (~40s). Matching just the title
+	// is not enough: a corrupt file also shows its name briefly before failing.
+	// videoTitle is the base name shown on the card (e.g. "avi_format", "VI_01").
 	public boolean CompleteUploadVideo(String videoTitle) {
 		try {
-			// Click the DIALOG's "Upload Video" commit button (unique 1-of-1 class) that actually sends the file.
-			String commitBtn = "//button[@class='px-5 py-2 rounded-xl bg-white text-black text-sm font-medium hover:bg-zinc-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white cursor-pointer flex items-center gap-2']";
-			PWActions.waitFor(commitBtn, "Wait for dialog 'Upload Video' button", 30000);
-			PWActions.click(commitBtn, "Clicked 'Upload Video' (commit upload)");
+			// Click the dialog's "Upload Video" commit button (actually sends the file).
+			PWActions.waitFor(UPLOAD_VIDEO_COMMIT_BTN, "Wait for dialog 'Upload Video' button", 30000);
+			PWActions.click(UPLOAD_VIDEO_COMMIT_BTN, "Clicked 'Upload Video' (commit upload)");
 
-			// Wait for the uploaded video's card to appear in the list.
-			String cardSelector = "//h3[contains(normalize-space(),'" + videoTitle + "')]";
-			PWActions.waitFor(cardSelector, "Wait for uploaded video '" + videoTitle + "'", 120000);
+			// Wait for the UPLOAD-COMPLETED card (title + "Just now"), which proves the upload succeeded.
+			String completedCard = "//div[h3[text()='" + videoTitle + "'] and .//span[contains(.,'Just now')]]";
+			PWActions.waitFor(completedCard, "Wait for completed upload '" + videoTitle + "'", 120000);
 
-			if (PWActions.isVisible(cardSelector, "Video '" + videoTitle + "' uploaded successfully")) {
-				System.out.println("✅ Video '" + videoTitle + "' appears in the list");
+			if (PWActions.isVisible(completedCard, "Video '" + videoTitle + "' upload completed")) {
+				System.out.println("✅ Video '" + videoTitle + "' upload completed (Just now)");
 				return true;
 			}
 
-			PWBaseTest.getFailureContext().setErrorMessage("Video '" + videoTitle + "' did not appear in the list");
+			PWBaseTest.getFailureContext().setErrorMessage("Video '" + videoTitle + "' upload did not complete");
 			return false;
 
+		} catch (Exception e) {
+			PWBaseTest.getFailureContext().setErrorMessage(e.getMessage());
+			return false;
+		}
+	}
+
+	// For the corrupt-file scenario: click commit, then PASS only if the upload-error message appears
+	// (the corrupt upload is correctly rejected). The completed "Just now" card must NOT appear.
+	public boolean ValidateCorruptUploadRejected() {
+		try {
+			PWActions.waitFor(UPLOAD_VIDEO_COMMIT_BTN, "Wait for dialog 'Upload Video' button", 30000);
+			PWActions.click(UPLOAD_VIDEO_COMMIT_BTN, "Clicked 'Upload Video' (corrupt file)");
+			return ValidateUploadErrorMessage();
 		} catch (Exception e) {
 			PWBaseTest.getFailureContext().setErrorMessage(e.getMessage());
 			return false;
