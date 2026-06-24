@@ -10,7 +10,6 @@ import pw.base.PWBaseTest;
 import pw.base.TestMeta;
 import pw.base.UserType;
 import pw.pages.visionAi.UploadVideoPage;
-import pw.pages.visionAi.VisionAI_LoginPage;
 import pw.utils.PWLog;
  
 
@@ -18,6 +17,26 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 {
 	String sheetName = "UploadVideo";
+
+	// TC_00 One-time Google sign-in (priority 0 -> runs FIRST). Enable this together with any test you want
+	// to run (e.g. TC_56) so the persistent profile is authenticated before that test executes. It skips
+	// automatically when already logged in. Set GOOGLE_EMAIL / GOOGLE_PASSWORD as env vars (e.g. in Jenkins).
+	@TestMeta(user = UserType.ADMIN, navPath = "")
+	@Test(dataProvider = "loginData", enabled = true, priority = 0, groups = { "Smoke" })
+	public void M_689_VisionAi_Login_00(Method method, Map<String, String> testData) {
+
+		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
+		String className = this.getClass().getSimpleName();
+		String email = System.getenv("GOOGLE_EMAIL");
+		String password = System.getenv("GOOGLE_PASSWORD");
+
+		// Sign in via Google once (auto-skips if the profile is already authenticated).
+		if (UploadVideoPage.LoginWithGoogle(email, password)) {
+			PWLog.Pass(className, "Authenticated session is ready for the suite");
+		} else {
+			PWLog.Fail(className, "Google sign-in failed: " + PWBaseTest.getFailureContext().getErrorMessage());
+		}
+	}
 
 	// TC_01_ Upload single
 	// video============================================================================================
@@ -307,26 +326,6 @@ public class Old_UploadVideoTest extends PWBaseTest
 			PWLog.Pass(className, " count decreased by one successfully");
 		} else {
 			PWLog.Fail(className, "Count not decreased" + PWBaseTest.getFailureContext().getErrorMessage());
-		}
-	}
-
-	// TC_00 One-time Google sign-in (priority 0 -> runs FIRST). Enable this together with any test you want
-	// to run (e.g. TC_56) so the persistent profile is authenticated before that test executes. It skips
-	// automatically when already logged in. Set GOOGLE_EMAIL / GOOGLE_PASSWORD as env vars (e.g. in Jenkins).
-	@TestMeta(user = UserType.ADMIN, navPath = "")
-	@Test(dataProvider = "loginData", enabled = true, priority = 0, groups = { "Smoke" })
-	public void M_689_VisionAi_Login_00(Method method, Map<String, String> testData) {
-
-		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
-		String className = this.getClass().getSimpleName();
-		String email = System.getenv("GOOGLE_EMAIL");
-		String password = System.getenv("GOOGLE_PASSWORD");
-
-		// Sign in via Google once (auto-skips if the profile is already authenticated).
-		if (UploadVideoPage.LoginWithGoogle(email, password)) {
-			PWLog.Pass(className, "Authenticated session is ready for the suite");
-		} else {
-			PWLog.Fail(className, "Google sign-in failed: " + PWBaseTest.getFailureContext().getErrorMessage());
 		}
 	}
 
