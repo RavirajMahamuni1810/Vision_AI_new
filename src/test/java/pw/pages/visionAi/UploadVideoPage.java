@@ -311,9 +311,8 @@ public class UploadVideoPage
 	// name once processed (e.g. "VI_01").
 	public boolean CompleteUploadVideo(String videoTitle) {
 		try {
-			// Click the DIALOG's "Upload Video" commit button (the last one in the DOM = the modal footer
-			// button, not the page button that opened the dialog). This actually sends the file.
-			String commitBtn = "(//button[normalize-space()='Upload Video'])[last()]";
+			// Click the DIALOG's "Upload Video" commit button (unique 1-of-1 class) that actually sends the file.
+			String commitBtn = "//button[@class='px-5 py-2 rounded-xl bg-white text-black text-sm font-medium hover:bg-zinc-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white cursor-pointer flex items-center gap-2']";
 			PWActions.waitFor(commitBtn, "Wait for dialog 'Upload Video' button", 30000);
 			PWActions.click(commitBtn, "Clicked 'Upload Video' (commit upload)");
 
