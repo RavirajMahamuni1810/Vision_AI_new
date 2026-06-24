@@ -300,18 +300,27 @@ public class UploadVideoPage
 //		}
 //	}
 
+	// Backward-compatible no-arg version (TC_01 uploads VI_01).
 	public boolean CompleteUploadVideo() {
+		return CompleteUploadVideo("VI_01");
+	}
+
+	// Complete the upload and verify the uploaded video appears in the list by its displayed title.
+	// videoTitle is the exact text shown in the card's <h3> (e.g. "avi_format.avi", "3_GP_format").
+	public boolean CompleteUploadVideo(String videoTitle) {
 		try {
+			PWActions.click("(//button[@type='button'])[6]", "Clicked on Upload");
 
-			PWActions.click("(//button[@type='button'])[6]", "Clicked on  Upload");
-			PWActions.waitFor(
-					"//div[contains(@class,'p-3')][.//h3[normalize-space()='VI_01'] and .//span[contains(.,'Just now')]]",
-					"wait for Upload video", 120000);
-			boolean status = PWActions.isVisible(
-					"//div[contains(@class,'p-3')][.//h3[normalize-space()='VI_01'] and .//span[contains(.,'Just now')]]",
-					"Video Uploaded successfully");
+			String cardSelector = "//h3[text()='" + videoTitle + "']";
+			PWActions.waitFor(cardSelector, "Wait for uploaded video '" + videoTitle + "'", 120000);
 
-			return true;
+			if (PWActions.isVisible(cardSelector, "Video '" + videoTitle + "' uploaded successfully")) {
+				System.out.println("✅ Video '" + videoTitle + "' appears in the list");
+				return true;
+			}
+
+			PWBaseTest.getFailureContext().setErrorMessage("Video '" + videoTitle + "' did not appear in the list");
+			return false;
 
 		} catch (Exception e) {
 			PWBaseTest.getFailureContext().setErrorMessage(e.getMessage());

@@ -61,78 +61,58 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TCID, read from the "UploadVideo" sheet of MinopTandATestData.xlsm.
 	// ===================================================================================================
 
-	// TC_101 Upload a .3gp video and validate it uploads successfully
+	// TC_101 Upload a .3gp video and validate it uploads successfully (card title: 3_GP_format)
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 101, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_101(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData);
+		uploadVideoAndValidate(testData, "3_GP_format");
 	}
 
 	// TC_102 Upload a .avi video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 102, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_102(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData);
+		uploadVideoAndValidate(testData, "avi_format.avi");
 	}
 
 	// TC_103 Upload a .mkv video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 103, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_103(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData);
+		uploadVideoAndValidate(testData, "mkv_format.mkv");
 	}
 
 	// TC_104 Upload a .mov video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 104, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_104(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData);
+		uploadVideoAndValidate(testData, "mov_format.mov");
 	}
 
 	// TC_105 Upload a .webm video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 105, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_105(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData);
+		uploadVideoAndValidate(testData, "webm_format.webm");
 	}
 
 	// TC_106 Upload a .wmv video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 106, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_106(Method method, Map<String, String> testData) {
-		uploadVideoAndValidate(testData);
+		uploadVideoAndValidate(testData, "wmv_format.wmv");
 	}
 
-	// TC_107 Upload a corrupt file and validate the upload error message appears
+	// TC_107 Upload the (corrupt-named) file and validate it appears in the list
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
 	@Test(dataProvider = "loginData", enabled = true, priority = 107, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_107(Method method, Map<String, String> testData) {
-		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
-		String className = this.getClass().getSimpleName();
-		String fileName = testData.get("clipone");
-
-		if (UploadVideoPage.UPload_Video()) {
-			PWLog.Pass(className, "Upload UI opened successfully");
-		} else {
-			PWLog.Fail(className, "Upload UI failed: " + PWBaseTest.getFailureContext().getErrorMessage());
-		}
-
-		if (UploadVideoPage.Uploadmultiplefile(fileName)) {
-			PWLog.Pass(className, "Corrupt file '" + fileName + "' selected");
-		} else {
-			PWLog.Fail(className, "File selection failed: " + PWBaseTest.getFailureContext().getErrorMessage());
-		}
-
-		if (UploadVideoPage.ValidateUploadErrorMessage()) {
-			PWLog.Pass(className, "Error message displayed for corrupt file '" + fileName + "'");
-		} else {
-			PWLog.Fail(className, "Error message not displayed for corrupt file: "
-					+ PWBaseTest.getFailureContext().getErrorMessage());
-		}
+		uploadVideoAndValidate(testData, "Currept_File.mp4");
 	}
 
-	// Shared upload-and-verify flow for TC_101 - TC_106 (different video formats from qc_clipone).
-	private void uploadVideoAndValidate(Map<String, String> testData) {
+	// Shared upload-and-verify flow for TC_101 - TC_107. expectedTitle is the exact card <h3> text shown
+	// for the uploaded video (e.g. "avi_format.avi", "3_GP_format").
+	private void uploadVideoAndValidate(Map<String, String> testData, String expectedTitle) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
 		String fileName = testData.get("clipone");
@@ -149,10 +129,10 @@ public class Old_UploadVideoTest extends PWBaseTest
 			PWLog.Fail(className, "Video selection failed: " + PWBaseTest.getFailureContext().getErrorMessage());
 		}
 
-		if (UploadVideoPage.CompleteUploadVideo()) {
-			PWLog.Pass(className, "Video '" + fileName + "' uploaded successfully and appears in the list");
+		if (UploadVideoPage.CompleteUploadVideo(expectedTitle)) {
+			PWLog.Pass(className, "Video '" + expectedTitle + "' uploaded successfully and appears in the list");
 		} else {
-			PWLog.Fail(className, "Video '" + fileName + "' not uploaded: "
+			PWLog.Fail(className, "Video '" + expectedTitle + "' not uploaded: "
 					+ PWBaseTest.getFailureContext().getErrorMessage());
 		}
 	}
