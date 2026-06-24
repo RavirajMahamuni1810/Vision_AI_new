@@ -57,62 +57,55 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// ===================================================================================================
 	// TC_101 - TC_106: Upload videos in different formats and validate each uploads successfully.
 	// TC_107: Upload a corrupt file and validate the error toast appears.
-	// All of these run RIGHT AFTER TC_01 (dependsOnMethods = M_689_VisionAi_Login_01) every time TC_01 runs.
-	// File comes from the Excel "qc_clipone" column for each TCID.
+	// These run standalone (by priority 101-107). File comes from the Excel "qc_clipone" column for each
+	// TCID, read from the "UploadVideo" sheet of MinopTandATestData.xlsm.
 	// ===================================================================================================
 
 	// TC_101 Upload a .3gp video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 101, groups = { "Smoke" }, dependsOnMethods = {
-			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	@Test(dataProvider = "loginData", enabled = true, priority = 101, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_101(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData);
 	}
 
 	// TC_102 Upload a .avi video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 102, groups = { "Smoke" }, dependsOnMethods = {
-			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	@Test(dataProvider = "loginData", enabled = true, priority = 102, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_102(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData);
 	}
 
 	// TC_103 Upload a .mkv video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 103, groups = { "Smoke" }, dependsOnMethods = {
-			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	@Test(dataProvider = "loginData", enabled = true, priority = 103, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_103(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData);
 	}
 
 	// TC_104 Upload a .mov video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 104, groups = { "Smoke" }, dependsOnMethods = {
-			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	@Test(dataProvider = "loginData", enabled = true, priority = 104, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_104(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData);
 	}
 
 	// TC_105 Upload a .webm video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 105, groups = { "Smoke" }, dependsOnMethods = {
-			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	@Test(dataProvider = "loginData", enabled = true, priority = 105, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_105(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData);
 	}
 
 	// TC_106 Upload a .wmv video and validate it uploads successfully
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 106, groups = { "Smoke" }, dependsOnMethods = {
-			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	@Test(dataProvider = "loginData", enabled = true, priority = 106, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_106(Method method, Map<String, String> testData) {
 		uploadVideoAndValidate(testData);
 	}
 
 	// TC_107 Upload a corrupt file and validate the upload error message appears
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 107, groups = { "Smoke" }, dependsOnMethods = {
-			"M_689_VisionAi_Login_01" }, alwaysRun = true)
+	@Test(dataProvider = "loginData", enabled = true, priority = 107, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_107(Method method, Map<String, String> testData) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
