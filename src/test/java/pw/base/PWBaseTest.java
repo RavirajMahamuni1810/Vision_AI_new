@@ -839,34 +839,16 @@ public abstract class PWBaseTest {
 
 	@AfterMethod(alwaysRun = true)
 	public void tearDown(ITestResult result) throws IOException {
-		int stepFailures = PWLog.getStepFailureCount();
 		PWLog.getStepHistory().clear();
 		try {
 			Page currentPage = getPage();
 			if (currentPage != null) {
-				String recordVideo = mapExcel.get("recordVideo").trim();
-				Video video = currentPage.video();
-				// Close page first (this finalizes the recording)
-				currentPage.close();
-				if ("Y".equalsIgnoreCase(recordVideo) && video != null) {
-					// Save the video for EVERY test (pass and fail) into the run's report folder so it sits
-					// next to the screenshots and survives "mvn clean" (reports/ is outside target/).
-					try {
-						String execDir = System.getProperty("execution.dir");
-						Path destDir = (execDir != null && !execDir.trim().isEmpty())
-								? Paths.get(execDir)
-								: Paths.get("target", "videos");
-						Files.createDirectories(destDir);
-						Path videoFile = destDir.resolve(result.getMethod().getMethodName() + ".webm");
-						video.saveAs(videoFile);
-						Allure.addAttachment(result.getMethod().getMethodName() + " - Video", "video/webm",
-								Files.newInputStream(videoFile), "webm");
-						System.out.println("🎥 Saved video: " + videoFile);
-					} catch (Exception e) {
-						System.out.println("Video save failed: " + e.getMessage());
-					}
+				// The video was already saved + attached and the page closed by the test-result listener
+				// (PWExecutionController.captureVideo), where the Allure test context is still active. Here we
+				// only need to make sure the page is closed and then close the context.
+				if (!currentPage.isClosed()) {
+					currentPage.close();
 				}
-				// Close context
 				if (context != null) {
 					context.close();
 				}

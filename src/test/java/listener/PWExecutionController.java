@@ -147,6 +147,7 @@ public class PWExecutionController implements ISuiteListener, ITestListener, ICo
 		}
 
 		captureScreenshot(result, "Success Screenshot");
+		captureVideo(result);
 		logResult(result, "PASSED");
 	}
 
@@ -168,6 +169,7 @@ public class PWExecutionController implements ISuiteListener, ITestListener, ICo
 		}
 
 		captureScreenshot(result, "Failure Screenshot");
+		captureVideo(result);
 		logResult(result, "FAILED");
 	}
 
@@ -220,6 +222,38 @@ public class PWExecutionController implements ISuiteListener, ITestListener, ICo
 			}
 		} catch (Exception e) {
 			System.out.println("Screenshot error: " + e.getMessage());
+		}
+	}
+
+	// Save and attach the test video. Done HERE (in the test-result listener) - not in @AfterMethod -
+	// because the Allure test is still active here, so the attachment actually lands in the report. The page
+	// must be closed to finalize the Playwright recording, so we close it now; @AfterMethod then just closes
+	// the context.
+	private void captureVideo(ITestResult result) {
+		try {
+			String recordVideo = PWBaseTest.mapAllVariables.get("recordVideo");
+			if (recordVideo == null || !"Y".equalsIgnoreCase(recordVideo.trim()))
+				return;
+			Page page = PWBaseTest.getPage();
+			if (page == null)
+				return;
+			com.microsoft.playwright.Video video = page.video();
+			if (video == null)
+				return;
+			// Close the page to finalize the recording.
+			if (!page.isClosed())
+				page.close();
+			String execDir = System.getProperty("execution.dir");
+			java.nio.file.Path dest = (execDir != null && !execDir.trim().isEmpty())
+					? java.nio.file.Paths.get(execDir, result.getMethod().getMethodName() + ".webm")
+					: java.nio.file.Paths.get("target", "videos", result.getMethod().getMethodName() + ".webm");
+			java.nio.file.Files.createDirectories(dest.getParent());
+			video.saveAs(dest);
+			Allure.addAttachment(result.getMethod().getMethodName() + " - Video", "video/webm",
+					java.nio.file.Files.newInputStream(dest), "webm");
+			System.out.println("🎥 Video attached to report: " + dest);
+		} catch (Exception e) {
+			System.out.println("Video attach failed: " + e.getMessage());
 		}
 	}
 
