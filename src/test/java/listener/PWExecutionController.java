@@ -248,10 +248,25 @@ public class PWExecutionController implements ISuiteListener, ITestListener, ICo
 					? java.nio.file.Paths.get(execDir, result.getMethod().getMethodName() + ".webm")
 					: java.nio.file.Paths.get("target", "videos", result.getMethod().getMethodName() + ".webm");
 			java.nio.file.Files.createDirectories(dest.getParent());
-			video.saveAs(dest);
-			Allure.addAttachment(result.getMethod().getMethodName() + " - Video", "video/webm",
-					java.nio.file.Files.newInputStream(dest), "webm");
-			System.out.println("🎥 Video attached to report: " + dest);
+
+			// saveAs() sometimes WRITES the file and THEN throws "Page did not produce any video frames"
+			// (a persistent-context quirk). Isolate that so it doesn't skip the attach below.
+			try {
+				video.saveAs(dest);
+			} catch (Exception saveEx) {
+				System.out.println("video.saveAs warning (file may still be written): " + saveEx.getMessage());
+			}
+
+			// Attach the file if it actually exists with content - read into memory (same way the screenshot
+			// attaches, which works) so the video lands in the Allure report.
+			if (java.nio.file.Files.exists(dest) && java.nio.file.Files.size(dest) > 0) {
+				byte[] bytes = java.nio.file.Files.readAllBytes(dest);
+				Allure.addAttachment(result.getMethod().getMethodName() + " - Video", "video/webm",
+						new ByteArrayInputStream(bytes), "webm");
+				System.out.println("🎥 Video attached to report: " + dest);
+			} else {
+				System.out.println("🎥 Video not attached (empty/missing): " + dest);
+			}
 		} catch (Exception e) {
 			System.out.println("Video attach failed: " + e.getMessage());
 		}
