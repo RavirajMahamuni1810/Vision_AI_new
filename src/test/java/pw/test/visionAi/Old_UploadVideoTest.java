@@ -41,7 +41,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_01_ Upload single
 	// video============================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 1, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 1, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_01(Method method, Map<String, String> testData) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
@@ -181,7 +181,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_02_ upload Multiple
 	// video===========================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 2, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = false, priority = 2, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_02(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
