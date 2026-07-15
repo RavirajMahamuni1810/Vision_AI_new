@@ -266,13 +266,21 @@ public abstract class PWBaseTest {
 	        // BUILD URL
 	        // =====================================================
 
+	        // Since the app rebrand (dev.vision.mikshi.ai -> dev.playground.zyris.ai), "videos" /
+	        // "collections" / "cameras" are no longer separate routes: the app is a single-page
+	        // "/conversations" view with a "Source" tab selector for those three. baseUrl already IS
+	        // ".../conversations", so appending "/videos" etc. produced ".../conversations/videos",
+	        // which the app's router reads as "load conversation with id=videos" -> "Invalid UUID
+	        // format" error page. For these navPath values we navigate to baseUrl only, then click the
+	        // matching Source tab by its visible label instead of building a URL.
+	        String navPath = (meta != null && meta.navPath() != null) ? meta.navPath().trim() : "";
+	        java.util.Set<String> sourceTabs = new java.util.HashSet<>(java.util.Arrays.asList("videos", "collections", "cameras"));
+	        boolean isSourceTab = sourceTabs.contains(navPath.toLowerCase());
+
 	        String finalUrl = baseUrl;
 
-	        if (meta != null &&
-	                meta.navPath() != null &&
-	                !meta.navPath().isEmpty()) {
-
-	            finalUrl = joinUrl(baseUrl, meta.navPath());
+	        if (!navPath.isEmpty() && !isSourceTab) {
+	            finalUrl = joinUrl(baseUrl, navPath);
 	        }
 
 	        // =====================================================
@@ -296,12 +304,15 @@ public abstract class PWBaseTest {
 
 	        if (requiresAuth) {
 
-	            boolean loggedIn = false;
+	            boolean loggedIn;
 
-	            if (meta.navPath() != null &&
-	                    !meta.navPath().isEmpty()) {
-
-	                loggedIn = page.url().contains(meta.navPath());
+	            if (isSourceTab) {
+	                // A Source tab isn't reflected in the URL, so use "not on the login page" instead.
+	                loggedIn = !page.url().contains("/login");
+	            } else if (!navPath.isEmpty()) {
+	                loggedIn = page.url().contains(navPath);
+	            } else {
+	                loggedIn = false;
 	            }
 
 	            if (!loggedIn) {
@@ -309,8 +320,7 @@ public abstract class PWBaseTest {
 	                performLogin(meta.user(), dataMap);
 
 	                // Navigate again after login
-	                if (meta.navPath() != null &&
-	                        !meta.navPath().isEmpty()) {
+	                if (!navPath.isEmpty() && !isSourceTab) {
 
 	                    page.navigate(
 	                            finalUrl,
@@ -321,10 +331,23 @@ public abstract class PWBaseTest {
 	                }
 
 	                // Wait for redirect
-	                if (meta.navPath() != null &&
-	                        !meta.navPath().isEmpty()) {
+	                if (!navPath.isEmpty() && !isSourceTab) {
 
-	                    page.waitForURL("**" + meta.navPath() + "**");
+	                    page.waitForURL("**" + navPath + "**");
+	                }
+	            }
+
+	            if (isSourceTab) {
+	                // Click the matching Source tab (e.g. "Videos") by its visible label. Best-effort:
+	                // if it's already selected/not found, move on rather than failing test setup here.
+	                String label = Character.toUpperCase(navPath.charAt(0)) + navPath.substring(1).toLowerCase();
+	                String tabSelector = "//button[normalize-space(.)='" + label + "']";
+	                try {
+	                    page.locator(tabSelector).first()
+	                            .waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(15000));
+	                    page.locator(tabSelector).first().click();
+	                } catch (Exception sourceTabNotFound) {
+	                    System.out.println("Source tab '" + label + "' not found/clickable: " + sourceTabNotFound.getMessage());
 	                }
 	            }
 	        }
