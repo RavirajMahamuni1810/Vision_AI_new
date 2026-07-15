@@ -150,7 +150,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_107 Upload a corrupt file: the upload must FAIL (error shown), NOT complete. Passes only when the
 	// error appears (the "Just now" completed card must never show).
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = true, priority = 107, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 8, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_107(Method method, Map<String, String> testData) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
@@ -206,7 +206,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_02_ upload Multiple
 	// video===========================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 2, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 9, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_02(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -239,10 +239,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_03_ Total count increse After
-	// Upload==================================================================================
+	// TC_03_ Total count increse After Upload==================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 3, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 10, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_03(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -296,10 +295,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_04_ raw count dedected After
-	// delete------------------------------------------------------------------------------------
+	// TC_04_ raw count dedected After delete------------------------------------------------------------------------------------
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 3, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 11, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_04(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -354,12 +352,11 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_82_ large in length
-	// video-------------------------------------------------------------------------------------------------
+	// TC_180_ large in length video-------------------------------------------------------------------------------------------------
 	// NOTE: renumbered from 80 -> 82 so the conversation collection test can use M_689_VisionAi_Login_80.
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 1, groups = { "Smoke" })
-	public void M_689_VisionAi_Login_82(Method method, Map<String, String> testData) {
+	@Test(dataProvider = "loginData", enabled = true, priority = 12, groups = { "Smoke" })
+	public void M_689_VisionAi_Login_180(Method method, Map<String, String> testData) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
 		System.out.println("Full Test Data: " + testData);
@@ -387,11 +384,11 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_81_large in size
+	// TC_181_large in size
 	// video------------------------------------------------------------------------------------------------------
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 1, groups = { "Smoke" })
-	public void M_689_VisionAi_Login_81(Method method, Map<String, String> testData) {
+	@Test(dataProvider = "loginData", enabled = false, priority = 13, groups = { "Smoke" })
+	public void M_689_VisionAi_Login_181(Method method, Map<String, String> testData) {
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
 		System.out.println("Full Test Data: " + testData);
@@ -422,10 +419,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_05_ AddYouTube
-	// video-------------------------------------------------------------------------------------------------------
+	// TC_05_ Add YouTube video-------------------------------------------------------------------------------------------------------
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 5, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 14, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_05(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -441,10 +437,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 	}
 
-	// TC_06_ AddBroken YouTube
-	// video------------------------------------------------------------------------------------------------
+	// TC_06_ Add Broken You Tube video------------------------------------------------------------------------------------------------
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 6, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 15, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_06(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -459,10 +454,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_07_ Add_Private YouTube
-	// video------------------------------------------------------------------------------------------------
+	// TC_07_ Add_Private YouTube video------------------------------------------------------------------------------------------------
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 7, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 16, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_07(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -477,10 +471,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_08_ Add
-	// InstaagramVideo------------------------------------------------------------------------------------------------------
+	// TC_08_ Add InstaagramVideo------------------------------------------------------------------------------------------------------
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 8, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 17, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_08(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -495,10 +488,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_09_
-	// Add_LargeYouTube_Video---------------------------------------------------------------------------------------------------
+	// TC_09_  Add_LargeYouTube_Video---------------------------------------------------------------------------------------------------
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 9, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 18, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_09(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -513,10 +505,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_10 Single video
-	// process-------------------------------------------------------------------------------------------------------
+	// TC_10 Single video process-------------------------------------------------------------------------------------------------------
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 9, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 19, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_10(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -536,10 +527,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_11 Multiple video
-	// process=====================================================================================================
+	// TC_11 Multiple video process=====================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 9, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 20, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_11(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -562,7 +552,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 	// TC_12 Check count Processed video process
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 9, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 21, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_12(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -600,10 +590,10 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// ====================================================================================================================================
-	// TC_13 Check user Able to delete
+	// TC_13 Check user Able to Processed video delete============================================================================================================
+	 
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 3, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 22, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_13(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -647,10 +637,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 	}
 	// not Added validation
 
-	// TC_14 Check Notification display
-	// ================================================================================================
+	// TC_14 Check Notification display ===============================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 9, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 23, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_14(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -676,11 +665,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_15 Check search video
-	// display
-	// ====================================================================================================
+	// TC_15 Check search video display  ====================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 9, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 24, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_15(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -694,10 +681,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_16 Check while click on processed All processed video should be display
-	// ====================================================================================================
+	// TC_16 Check while click on processed tab  All processed video should be display ==================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 10, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 25, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_16(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -711,10 +697,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_17 Check while click on processed All processed video should be display
-	// ====================================================================================================
+	// TC_17 Check while click on raw tab All raw video should be display ====================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 10, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 26, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_17(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -731,7 +716,7 @@ public class Old_UploadVideoTest extends PWBaseTest
 	// TC_18 Check Video playing After click on video
 	// ====================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "videos")
-	@Test(dataProvider = "loginData", enabled = false, priority = 11, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 27, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_18(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -745,10 +730,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_19 create Collection
-	// ====================================================================================================
+	// TC_19 create Collection  ====================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "collections")
-	@Test(dataProvider = "loginData", enabled = false, priority = 11, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 28, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_19(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -768,10 +752,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_20 create same name Colection
-	// ====================================================================================================
+	// TC_20 create same name Colection ====================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "collections")
-	@Test(dataProvider = "loginData", enabled = false, priority = 12, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 29, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_20(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
@@ -785,10 +768,9 @@ public class Old_UploadVideoTest extends PWBaseTest
 		}
 	}
 
-	// TC_21 Add_singlevid_inCollection
-	// ====================================================================================================
+	// TC_21 Add_singlevid_inCollection ====================================================================================================
 	@TestMeta(user = UserType.ADMIN, navPath = "collections")
-	@Test(dataProvider = "loginData", enabled = false, priority = 12, groups = { "Smoke" })
+	@Test(dataProvider = "loginData", enabled = true, priority = 30, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_21(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
