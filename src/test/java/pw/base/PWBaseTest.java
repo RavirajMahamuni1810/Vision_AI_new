@@ -266,21 +266,18 @@ public abstract class PWBaseTest {
 	        // BUILD URL
 	        // =====================================================
 
-	        // Since the app rebrand (dev.vision.mikshi.ai -> dev.playground.zyris.ai), "videos" /
-	        // "collections" / "cameras" are no longer separate routes: the app is a single-page
-	        // "/conversations" view with a "Source" tab selector for those three. baseUrl already IS
-	        // ".../conversations", so appending "/videos" etc. produced ".../conversations/videos",
-	        // which the app's router reads as "load conversation with id=videos" -> "Invalid UUID
-	        // format" error page. For these navPath values we navigate to baseUrl only, then click the
-	        // matching Source tab by its visible label instead of building a URL.
+	        // navPath values ("videos", "collections", "cameras", "settings", "analytics", ...) are
+	        // sibling top-level routes off the site root (e.g. https://dev.playground.zyris.ai/videos),
+	        // NOT nested under baseUrl's own path. baseUrl itself already points at ".../conversations",
+	        // so joining navPath onto baseUrl produced ".../conversations/videos", which the app's
+	        // router misreads as "load conversation with id=videos" -> "Invalid UUID format" error.
+	        // Join navPath onto the site root instead.
 	        String navPath = (meta != null && meta.navPath() != null) ? meta.navPath().trim() : "";
-	        java.util.Set<String> sourceTabs = new java.util.HashSet<>(java.util.Arrays.asList("videos", "collections", "cameras"));
-	        boolean isSourceTab = sourceTabs.contains(navPath.toLowerCase());
 
 	        String finalUrl = baseUrl;
 
-	        if (!navPath.isEmpty() && !isSourceTab) {
-	            finalUrl = joinUrl(baseUrl, navPath);
+	        if (!navPath.isEmpty()) {
+	            finalUrl = joinUrl(siteRoot(baseUrl), navPath);
 	        }
 
 	        // =====================================================
@@ -304,23 +301,14 @@ public abstract class PWBaseTest {
 
 	        if (requiresAuth) {
 
-	            boolean loggedIn;
-
-	            if (isSourceTab) {
-	                // A Source tab isn't reflected in the URL, so use "not on the login page" instead.
-	                loggedIn = !page.url().contains("/login");
-	            } else if (!navPath.isEmpty()) {
-	                loggedIn = page.url().contains(navPath);
-	            } else {
-	                loggedIn = false;
-	            }
+	            boolean loggedIn = !navPath.isEmpty() && page.url().contains(navPath);
 
 	            if (!loggedIn) {
 
 	                performLogin(meta.user(), dataMap);
 
 	                // Navigate again after login
-	                if (!navPath.isEmpty() && !isSourceTab) {
+	                if (!navPath.isEmpty()) {
 
 	                    page.navigate(
 	                            finalUrl,
@@ -331,23 +319,9 @@ public abstract class PWBaseTest {
 	                }
 
 	                // Wait for redirect
-	                if (!navPath.isEmpty() && !isSourceTab) {
+	                if (!navPath.isEmpty()) {
 
 	                    page.waitForURL("**" + navPath + "**");
-	                }
-	            }
-
-	            if (isSourceTab) {
-	                // Click the matching Source tab (e.g. "Videos") by its visible label. Best-effort:
-	                // if it's already selected/not found, move on rather than failing test setup here.
-	                String label = Character.toUpperCase(navPath.charAt(0)) + navPath.substring(1).toLowerCase();
-	                String tabSelector = "//button[normalize-space(.)='" + label + "']";
-	                try {
-	                    page.locator(tabSelector).first()
-	                            .waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(15000));
-	                    page.locator(tabSelector).first().click();
-	                } catch (Exception sourceTabNotFound) {
-	                    System.out.println("Source tab '" + label + "' not found/clickable: " + sourceTabNotFound.getMessage());
 	                }
 	            }
 	        }
@@ -369,6 +343,17 @@ public abstract class PWBaseTest {
 			return baseUrl + "/" + path;
 		}
 		return baseUrl + path;
+	}
+
+	// Scheme + host (+ port) only, e.g. "https://dev.playground.zyris.ai/conversations" -> "https://dev.playground.zyris.ai".
+	// navPath values are sibling routes off this root, not children of baseUrl's own path.
+	private String siteRoot(String url) {
+		try {
+			java.net.URL u = new java.net.URL(url);
+			return u.getProtocol() + "://" + u.getAuthority();
+		} catch (Exception e) {
+			return url;
+		}
 	}
 
 	/**
