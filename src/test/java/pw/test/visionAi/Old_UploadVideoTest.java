@@ -20,15 +20,16 @@ public class Old_UploadVideoTest extends PWBaseTest
 
 	// TC_00 One-time Google sign-in (priority 0 -> runs FIRST). Enable this together with any test you want
 	// to run (e.g. TC_56) so the persistent profile is authenticated before that test executes. It skips
-	// automatically when already logged in. Set GOOGLE_EMAIL / GOOGLE_PASSWORD as env vars (e.g. in Jenkins).
+	// automatically when already logged in. Reads GOOGLE_EMAIL / GOOGLE_PASSWORD from env vars first (e.g.
+	// set in Jenkins); if those aren't set, falls back to the gitignored secrets.properties at repo root.
 	@TestMeta(user = UserType.ADMIN, navPath = "")
 	@Test(dataProvider = "loginData", enabled = true, priority = 0, groups = { "Smoke" })
 	public void M_689_VisionAi_Login_00(Method method, Map<String, String> testData) {
 
 		UploadVideoPage UploadVideoPage = new UploadVideoPage(getPage());
 		String className = this.getClass().getSimpleName();
-		String email = System.getenv("GOOGLE_EMAIL");
-		String password = System.getenv("GOOGLE_PASSWORD");
+		String email = resolveCredential("GOOGLE_EMAIL");
+		String password = resolveCredential("GOOGLE_PASSWORD");
 
 		// Sign in via Google once (auto-skips if the profile is already authenticated).
 		if (UploadVideoPage.LoginWithGoogle(email, password)) {
@@ -36,6 +37,30 @@ public class Old_UploadVideoTest extends PWBaseTest
 		} else {
 			PWLog.Fail(className, "Google sign-in failed: " + PWBaseTest.getFailureContext().getErrorMessage());
 		}
+	}
+
+	// Fixed absolute path (not relative to the working directory) so it resolves the same whether the
+	// suite runs locally from this repo folder or from Jenkins' own workspace checkout of the same repo
+	// (Jenkins clones into C:\Users\...\.jenkins\workspace\..., a different folder). Mirrors the same
+	// absolute-path convention already used for PLAYWRIGHT_USER_DATA_DIR in PWBaseTest.
+	private static final String SECRETS_FILE = "C:\\Users\\MN001752\\git\\repository\\Miksh\\secrets.properties";
+
+	private static String resolveCredential(String key) {
+		String envValue = System.getenv(key);
+		if (envValue != null && !envValue.trim().isEmpty()) {
+			return envValue;
+		}
+		java.io.File file = new java.io.File(SECRETS_FILE);
+		if (file.exists()) {
+			try (java.io.FileInputStream fis = new java.io.FileInputStream(file)) {
+				java.util.Properties props = new java.util.Properties();
+				props.load(fis);
+				return props.getProperty(key);
+			} catch (Exception e) {
+				System.out.println("⚠️ Could not read " + SECRETS_FILE + ": " + e.getMessage());
+			}
+		}
+		return null;
 	}
 
 	// TC_01_ Upload single

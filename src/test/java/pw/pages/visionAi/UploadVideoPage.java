@@ -4946,22 +4946,36 @@ public class UploadVideoPage
 	// Run TC_00 (priority 0) together with any test (e.g. TC_56); TC_00 signs in first and the persistent
 	//   profile keeps the session, so later tests open already authenticated. Skips automatically when the
 	//   profile is already logged in (the "Continue with Google" button won't be present).
-	private static final String CONTINUE_WITH_GOOGLE_BTN = "//button[@class='mt-10 w-full h-12 inline-flex items-center justify-center gap-3 rounded-xl bg-white text-black font-medium hover:bg-zinc-100 transition-all shadow-depth-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer']";
+	// Text-based (not class-based) so it survives CSS/rebrand changes - the app moved from
+	// dev.vision.mikshi.ai to dev.playground.zyris.ai and the old class-based selector + hardcoded
+	// success domain below both went stale, which is what broke session reuse.
+	private static final String SIGN_IN_WITH_GOOGLE_BTN = "//button[contains(., 'Sign in with Google') or contains(., 'Continue with Google')]";
+	private static final String USE_ANOTHER_ACCOUNT = "//div[@role='link' and contains(., 'Use another account')] | //li[contains(., 'Use another account')]";
 	private static final String GOOGLE_EMAIL_INPUT = "(//input[@class='whsOnd zHQkBf'])[1]";
 	private static final String GOOGLE_PASSWORD_INPUT = "(//input[@class='whsOnd zHQkBf'])[1]";
 	private static final String GOOGLE_NEXT_BUTTON = "(//div[@class='VfPpkd-RLmnJb'])[2]";
 
 	public boolean LoginWithGoogle(String email, String password) {
 		try {
-			// 0) If the profile is already authenticated, the "Continue with Google" button isn't shown -> skip.
-			boolean needLogin;
-			try {
-				page.locator(CONTINUE_WITH_GOOGLE_BTN).first()
-						.waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(8000));
-				needLogin = true;
-			} catch (Exception alreadyAuthenticated) {
-				needLogin = false;
+			// Give the app a moment to redirect to /login if the persisted session is no longer valid.
+			Thread.sleep(1500);
+
+			// 0) Determine whether login is actually required. Prefer the URL over a specific
+			// "Sign in" button selector: a stale/rebranded selector silently reports "not found",
+			// which used to be misread as "already logged in" while still sitting on the login page.
+			String currentUrl = page.url();
+			boolean needLogin = currentUrl.contains("/login") || currentUrl.contains("accounts.google.com");
+
+			if (!needLogin) {
+				try {
+					page.locator(SIGN_IN_WITH_GOOGLE_BTN).first()
+							.waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(4000));
+					needLogin = true;
+				} catch (Exception alreadyAuthenticated) {
+					needLogin = false;
+				}
 			}
+
 			if (!needLogin) {
 				System.out.println("✅ Already authenticated (persistent session) - skipping Google login");
 				return true;
@@ -4975,28 +4989,71 @@ public class UploadVideoPage
 				return false;
 			}
 
-			// 1) Start the Google OAuth flow.
-			PWActions.click(CONTINUE_WITH_GOOGLE_BTN, "Clicked Continue with Google");
+			// 1) Start the Google OAuth flow (skip if we're already mid-flow on accounts.google.com).
+			if (!page.url().contains("accounts.google.com")) {
+				PWActions.waitFor(SIGN_IN_WITH_GOOGLE_BTN, "Wait for Sign in with Google button", 30000);
+				PWActions.click(SIGN_IN_WITH_GOOGLE_BTN, "Clicked Sign in with Google");
+			}
 
-			// 2) Enter the email and continue.
-			PWActions.waitFor(GOOGLE_EMAIL_INPUT, "Wait for Google email field", 30000);
-			PWActions.fill(GOOGLE_EMAIL_INPUT, email, "Entered Google email");
-			PWActions.waitFor(GOOGLE_NEXT_BUTTON, "Wait for Next (email)", 30000);
-			PWActions.click(GOOGLE_NEXT_BUTTON, "Clicked Next (email)");
+			// 2) Google may show the account chooser (when the profile already has one or more signed-in
+			// Google accounts cached, e.g. after a prior manual login in this same browser profile)
+			// instead of the plain email entry screen. Prefer the account matching the configured email.
+			String accountEntry = "//div[@data-identifier='" + email + "']";
+			boolean chooserMatch;
+			try {
+				page.locator(accountEntry).first()
+						.waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(6000));
+				chooserMatch = true;
+			} catch (Exception noChooserMatch) {
+				chooserMatch = false;
+			}
 
-			// 3) Enter the password and continue.
-			PWActions.waitFor(GOOGLE_PASSWORD_INPUT, "Wait for Google password field", 30000);
-			Thread.sleep(1500); // let the password screen settle in
-			PWActions.fill(GOOGLE_PASSWORD_INPUT, password, "Entered Google password");
-			PWActions.waitFor(GOOGLE_NEXT_BUTTON, "Wait for Next (password)", 30000);
-			PWActions.click(GOOGLE_NEXT_BUTTON, "Clicked Next (password)");
+			if (chooserMatch) {
+				PWActions.click(accountEntry, "Selected Google account: " + email);
 
-			// 4) Wait to be redirected back to the app, signed in (poll up to 60s for a non-login app URL).
+				// The cached account's session may have actually expired (that's the scenario that broke
+				// session reuse in the first place), in which case Google re-prompts for the password
+				// instead of signing straight back in. Handle that re-prompt if it shows up.
+				try {
+					page.locator(GOOGLE_PASSWORD_INPUT).first()
+							.waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(8000));
+					Thread.sleep(1000);
+					PWActions.fill(GOOGLE_PASSWORD_INPUT, password, "Entered Google password (session re-confirm)");
+					PWActions.waitFor(GOOGLE_NEXT_BUTTON, "Wait for Next (password re-confirm)", 30000);
+					PWActions.click(GOOGLE_NEXT_BUTTON, "Clicked Next (password re-confirm)");
+				} catch (Exception noPasswordRePrompt) {
+					// Session was still valid - Google went straight back to the app.
+				}
+			} else {
+				// No cached account matches -> if a chooser is showing (with only other accounts),
+				// switch to "Use another account" so the email entry screen below applies.
+				try {
+					page.locator(USE_ANOTHER_ACCOUNT).first()
+							.waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(3000));
+					PWActions.click(USE_ANOTHER_ACCOUNT, "Clicked 'Use another account'");
+				} catch (Exception noChooserAtAll) {
+					// Not a chooser screen at all - already on the email entry screen.
+				}
+
+				// Enter the email and continue.
+				PWActions.waitFor(GOOGLE_EMAIL_INPUT, "Wait for Google email field", 30000);
+				PWActions.fill(GOOGLE_EMAIL_INPUT, email, "Entered Google email");
+				PWActions.waitFor(GOOGLE_NEXT_BUTTON, "Wait for Next (email)", 30000);
+				PWActions.click(GOOGLE_NEXT_BUTTON, "Clicked Next (email)");
+
+				// Enter the password and continue.
+				PWActions.waitFor(GOOGLE_PASSWORD_INPUT, "Wait for Google password field", 30000);
+				Thread.sleep(1500); // let the password screen settle in
+				PWActions.fill(GOOGLE_PASSWORD_INPUT, password, "Entered Google password");
+				PWActions.waitFor(GOOGLE_NEXT_BUTTON, "Wait for Next (password)", 30000);
+				PWActions.click(GOOGLE_NEXT_BUTTON, "Clicked Next (password)");
+			}
+
+			// 3) Wait to be redirected back to the app, signed in (poll up to 60s for a non-login/OAuth URL).
 			long deadline = System.currentTimeMillis() + 60000;
 			while (System.currentTimeMillis() < deadline) {
 				String url = page.url();
-				if (url.contains("dev.vision.mikshi.ai") && !url.contains("/login")
-						&& !url.contains("accounts.google.com")) {
+				if (!url.contains("accounts.google.com") && !url.contains("/login")) {
 					break;
 				}
 				Thread.sleep(1000);
