@@ -502,15 +502,30 @@ public class UploadVideoPage
 		}
 	}
 
+	// Backward-compatible no-arg version (existing callers delete the "VI_01" upload, e.g. TC_13).
 	public boolean DeleteVideo() {
+		return DeleteVideo("VI_01");
+	}
+
+	// Deletes the SPECIFIC video card matching videoTitle. The old version clicked "the 2nd
+	// button[type=button] anywhere on the page", which is not reliably this test's own video - the
+	// same account accumulates leftover/in-progress uploads across every past test run (including
+	// ones that never finish, e.g. a stuck YouTube import), which shifts that page-wide index around.
+	// Scoping the lookup to the card whose title matches videoTitle avoids that. If several cards
+	// share the same title (e.g. VI_01 uploaded in past runs too), the first match is the newest one
+	// (cards are newest-first), which is the one this run itself just uploaded.
+	public boolean DeleteVideo(String videoTitle) {
 		try {
 
 			PWActions.refresh("Refresh the page before delete");
-			PWActions.waitFor("(//button[@type='button'])[2]", "Wait for delete button to be visible", 30000);
-			PWActions.click("(//button[@type='button'])[2]", "delete video");
+
+			String cardDeleteButton = "(//div[h3[text()='" + videoTitle + "']]//button[@type='button'])[1]";
+
+			PWActions.waitFor(cardDeleteButton, "Wait for delete button on '" + videoTitle + "' to be visible", 30000);
+			PWActions.click(cardDeleteButton, "Clicked delete on '" + videoTitle + "'");
 			PWActions.click(
 					"//button[@class='flex cursor-pointer items-center gap-2 px-5 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-all shadow-[0_0_20px_rgba(239,68,68,0.2)] disabled:opacity-40 disabled:cursor-not-allowed']",
-					" click on delete tab");
+					"Confirmed delete for '" + videoTitle + "'");
 
 			// Wait for deletion to be processed
 			Thread.sleep(3000);
@@ -544,7 +559,6 @@ public class UploadVideoPage
 	}
 
 	// TC_05---------------------------------------------------------------------------------------------------------------------------------------
-
 	public boolean UPload_You_Tube_video(String url) {
 		try {
 
@@ -560,14 +574,14 @@ public class UploadVideoPage
 					"Clicked on  YouTube URL tab");
 			PWActions.click("input[type='url']", "Click on You tube placeholder");
 			PWActions.fill("input[type='url']", url, "Enter You tube URL");
-			PWActions.fill("//input[@placeholder='e.g. Car Crash']", "panchayatvideo", " enter name of video");
+			PWActions.fill("//input[@placeholder='e.g. Car Crash']", "YouTubeVideo", " enter name of video");
 			PWActions.click("(//button[text()='Upload Video'])[2]", "  Click on upload video");
 
-			PWActions.waitFor("//h3[contains(.,'panchayatvideo') and ancestor::div[.//span[contains(.,'Just now')]]]",
+			PWActions.waitFor("//h3[contains(.,'YouTubeVideo') and ancestor::div[.//span[contains(.,'Just now')]]]",
 					"Wait for video name element to be visible", 30000);
 
 			boolean status = PWActions.isVisible(
-					"//h3[contains(.,'panchayatvideo') and ancestor::div[.//span[contains(.,'Just now')]]]",
+					"//h3[contains(.,'YouTubeVideo') and ancestor::div[.//span[contains(.,'Just now')]]]",
 					"You Tube Video Uploaded successfully");
 
 		} catch (Exception e) {
@@ -576,6 +590,7 @@ public class UploadVideoPage
 		}
 		return true;
 	}
+	 
 	// TC_06---------------------------------------------------------------------------------------------------------------------------------------
 
 	public boolean UPload_BrokenYou_Tube_video(String url) {
